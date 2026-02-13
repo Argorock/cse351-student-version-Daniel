@@ -40,7 +40,7 @@ def process_range(start, end, thread_number, thread_count, lock_prime, lock_proc
         if is_prime(i):
             with lock_prime:
                 prime_count += 1
-            print(i, end=', ', flush=True)
+            print(i, end=', ', flush=False)
 
         with lock_processed:
             numbers_processed += 1

@@ -145,7 +145,6 @@ class Board():
             else:
                 return False
 
-        # Highlight the found word
         for r, c in changes:
             self.highlight(r, c)
 

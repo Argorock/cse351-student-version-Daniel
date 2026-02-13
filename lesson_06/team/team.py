@@ -121,16 +121,21 @@ class Board():
     def _word_at_this_location(self, row, col, direction, word):
         """ Helper function: is the word found on the board at (x, y) in a direction """
         dir_x, dir_y = self.directions[direction]
-        highlight_copy = copy.deepcopy(self.highlighting)
+        changes = []
+
         for letter in word:
             board_letter = self.get_letter(row, col)
             if board_letter == letter:
-                self.highlight(row, col)
+                changes.append((row, col))
                 row += dir_x
                 col += dir_y
             else:
-                self.highlighting = copy.deepcopy(highlight_copy)
                 return False
+
+        
+        for r, c in changes:
+            self.highlight(r, c)
+
         return True
 
     def find_word(self, word):
@@ -138,15 +143,20 @@ class Board():
         print(f'Finding {word}...')
         for row in range(self.size):
             for col in range(self.size):
-                for d in range(0, 8):
-                    if self._word_at_this_location(row, col, d, word):
-                        return True
+                if self.get_letter(row, col) == word[0]:
+                    for d in range(0, 8):
+                        if self._word_at_this_location(row, col, d, word):
+                            return True
         return False
 
 
 def main():
     board = Board()
     board.display()
+
+
+
+    start = time.perf_counter()
 
     start = time.perf_counter()
     for word in words:

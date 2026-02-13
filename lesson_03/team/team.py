@@ -34,23 +34,29 @@ TODO
 
 from datetime import datetime, timedelta
 import threading
+import queue
+
 from common import *
 
 # Include cse 351 common Python files
 from cse351 import *
 
 # global
+THREADS = 10
 call_count = 0
 
-def get_urls(film6, kind):
+def worker(que):
     global call_count
 
-    urls = film6[kind]
-    print(kind)
-    for url in urls:
+    while True:
         call_count += 1
-        item = get_data_from_server(url)
-        print(f'  - {item["name"]}')
+        url = que.get()
+        if url is None:
+            break
+
+        data = get_data_from_server(url)
+        print(f'  - {data['name']}')
+
 
 def main():
     global call_count
@@ -62,12 +68,43 @@ def main():
     call_count += 1
     print_dict(film6)
 
-    # Retrieve people
-    get_urls(film6, 'characters')
-    get_urls(film6, 'planets')
-    get_urls(film6, 'starships')
-    get_urls(film6, 'vehicles')
-    get_urls(film6, 'species')
+    # Create shared queue
+    que = queue.Queue()
+
+    # Create threads
+    threads = []
+    for i in range(THREADS):
+        t = threading.Thread(target=worker, args=(que,))
+        threads.append(t)
+
+    # Start threads
+    for t in threads:
+        t.start()
+
+    # fill queue with urls
+
+    for url in film6['characters']:
+        que.put(url)
+    
+    for url in film6['planets']:
+        que.put(url)
+    
+    for url in film6['starships']:
+        que.put(url)
+    
+    for url in film6['vehicles']:
+        que.put(url)
+    
+    for url in film6['species']:
+        que.put(url)
+
+    # MUST add a "all done" message for each worker
+    for i in range(THREADS):
+        que.put(None)
+    
+    # Join threads - wait for the workers to finish
+    for t in threads:
+        t.join()
 
     log.stop_timer('Total Time To complete')
     log.write(f'There were {call_count} calls to the server')

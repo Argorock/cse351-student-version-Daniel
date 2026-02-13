@@ -45,28 +45,78 @@ def is_prime(n):
     return True
 
 
-def main():
-    global prime_count                  # Required in order to use a global variable
-    global numbers_processed            # Required in order to use a global variable
+# def main():
+#     global prime_count                  # Required in order to use a global variable
+#     global numbers_processed            # Required in order to use a global variable
 
+    # log = Log(show_terminal=True)
+    # log.start_timer()
+
+#     start = 10000000000
+#     range_count = 100000
+#     numbers_processed = 0
+
+
+
+#     thread_count = 10
+#     threads = []
+#     thread_range = range_count // thread_count
+    
+#     for thread_number in range(thread_count):
+#         thread_start = start + (thread_range * thread_number)
+#         thread_end = thread_start + thread_range
+#         thread = threading.Thread(args=(thread_start, thread_end))
+#         threads.append(thread)
+
+#     for thread in threads:
+#         thread.start()
+
+#     for thread in threads:
+#         thread.join()
+
+    # for i in range(start, start + range_count):
+    #     numbers_processed += 1
+    #     if is_prime(i):
+    #         prime_count += 1
+    #         print(i, end=', ', flush=True)
+    # print(flush=True)
+
+
+#     # Should find 4306 primes
+    # log.write(f'Numbers processed = {numbers_processed}')
+    # log.write(f'Primes found      = {prime_count}')
+    # log.stop_timer('Total time')
+
+def worker(start, range_count, index, step):
+    global prime_count
+
+    for i in range(start + index, start + range_count, step):
+            # numbers_processed += 1
+        if is_prime(i):
+            prime_count += 1
+            print(i, end=', ', flush=True)
+    print(flush=True)
+    
+
+
+if __name__ == '__main__':
     log = Log(show_terminal=True)
     log.start_timer()
 
     start = 10000000000
     range_count = 100000
-    numbers_processed = 0
-    for i in range(start, start + range_count):
-        numbers_processed += 1
-        if is_prime(i):
-            prime_count += 1
-            print(i, end=', ', flush=True)
-    print(flush=True)
 
-    # Should find 4306 primes
+    workers = []
+    for i in range(n):
+        t = threading.Thread(target=worker, args = (start, range_count, i, n))
+        workers.append(t)
+
+        for t in workers:
+            t.start()
+
+        for t in workers:
+            t.join()
+    
     log.write(f'Numbers processed = {numbers_processed}')
     log.write(f'Primes found      = {prime_count}')
     log.stop_timer('Total time')
-
-
-if __name__ == '__main__':
-    main()
